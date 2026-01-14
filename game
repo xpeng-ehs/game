@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全承诺闯关游戏 - 汽车厂EHS管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            color: #1a2980;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .step-container {
+            display: none;
+        }
+        
+        .step-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-title {
+            color: #1a2980;
+            margin-bottom: 20px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .step-title .icon {
+            background: #1a2980;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #1a2980;
+            outline: none;
+        }
+        
+        .safety-card {
+            background: #f8f9fa;
+            border-left: 4px solid #1a2980;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .safety-card h4 {
+            color: #1a2980;
+            margin-bottom: 10px;
+        }
+        
+        .safety-card ul {
+            padding-left: 20px;
+        }
+        
+        .safety-card li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .pledge-text {
+            background: #e3f2fd;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 22px;
+            line-height: 1.8;
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            border: 2px dashed #1a2980;
+        }
+        
+        .pledge-word {
+            display: inline-block;
+            padding: 5px 3px;
+            margin: 0 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .pledge-word.unclicked {
+            background: white;
+            color: #333;
+        }
+        
+        .pledge-word.clicked {
+            background: #4CAF50;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        .pledge-word.clicked::after {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffeb3b;
+            color: #333;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-container {
+            margin: 30px 0;
+            background: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1a2980, #26d0ce);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .counter {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: block;
+            margin: 30px auto;
+            font-weight: bold;
+            min-width: 200px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 41, 128, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .certificate {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border: 15px solid #1a2980;
+            position: relative;
+        }
+        
+        .certificate.active {
+            display: block;
+            animation: zoomIn 0.8s ease;
+        }
+        
+        .certificate h2 {
+            color: #1a2980;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        
+        .certificate h3 {
+            color: #333;
+            margin: 30px 0;
+            font-size: 24px;
+        }
+        
+        .employee-info {
+            font-size: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .signature-line {
+            margin-top: 40px;
+            border-top: 2px solid #333;
+            width: 300px;
+            padding-top: 10px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .stamp {
+            position: absolute;
+            right: 50px;
+            bottom: 50px;
+            width: 120px;
+            height: 120px;
+            border: 5px solid red;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(15deg);
+            background: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+            color: red;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: #f00;
+            opacity: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .pledge-text {
+                font-size: 18px;
+                padding: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 汽车厂安全承诺闯关游戏</h1>
+            <p class="subtitle">EHS安全管理 - 互动式安全责任承诺系统</p>
+            <div class="badge">2024年度安全责任书</div>
+        </div>
+        
+        <!-- 步骤1：员工信息输入 -->
+        <div id="step1" class="step-container active">
+            <div class="step-title">
+                <div class="icon">1</div>
+                <span>员工身份验证</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="employeeName">姓名：</label>
+                <input type="text" id="employeeName" class="form-control" placeholder="请输入您的姓名">
+            </div>
+            
+            <div class="form-group">
+                <label for="employeeId">工号：</label>
+                <input type="text" id="employeeId" class="form-control" placeholder="请输入您的员工工号">
+            </div>
+            
+            <div class="form-group">
+                <label for="department">所属部门：</label>
+                <select id="department" class="form-control">
+                    <option value="">请选择您的部门</option>
+                    <option value="冲压车间">冲压车间</option>
+                    <option value="焊接车间">焊接车间</option>
+                    <option value="涂装车间">涂装车间</option>
+                    <option value="总装车间">总装车间</option>
+                    <option value="设备维修">设备维修</option>
+                    <option value="物流仓储">物流仓储</option>
+                    <option value="质量管理">质量管理</option>
+                    <option value="行政部门">行政部门</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="nextStep(1)">开始安全承诺闯关</button>
+        </div>
+        
+        <!-- 步骤2：安全职责学习 -->
+        <div id="step2" class="step-container">
+            <div class="step-title">
+                <div class="icon">2</div>
+                <span>学习安全职责</span>
+            </div>
+            
+            <p style="margin-bottom: 20px; color: #666;">请仔细阅读以下EHS安全职责要求：</p>
+            
+            <div class="safety-card">
+                <h4>🎯 核心安全责任</h4>
+                <ul>
+                    <li>严格遵守公司安全规章制度和操作规程</li>
+                    <li>正确佩戴和使用劳动防护用品</li>
+                    <li>不违章作业，并及时制止他人违章行为</li>
+                    <li>发现事故隐患及时报告并参与整改</li>
+                </ul>
+            </div>
+            
+            <div class="safety-card">
+                <h4>📚 培训与演练要求</h4>
+                <ul>
+                    <li>按时参加公司组织的各类安全培训</li>
+                    <li>积极参与应急演练，掌握逃生和急救技能</li>
+                    <li>新员工必须通过三级安全教育考核</li>
+                    <li>特种作业人员必须持证上岗</li>
+                </ul>
+            </div>
+            
+            <div class="safety-card">
+                <h4>🏥 职业健康管理</h4>
+                <ul>
+                    <li>按时参加职业健康体检</li>
+                    <li>了解本岗位职业危害因素及防护措施</li>
+                    <li>正确使用职业病防护设施和个人防护用品</li>
+                    <li>发现身体异常及时报告并就医检查</li>
+                </ul>
+            </div>
+            
+            <div class="safety-card">
+                <h4>🚨 应急响应责任</h4>
+                <ul>
+                    <li>熟悉本岗位应急处理程序</li>
+                    <li>了解消防器材位置和使用方法</li>
+                    <li>掌握紧急疏散路线和集合地点</li>
+                    <li>发生事故时及时报告并参与初期处置</li>
+                </ul>
+            </div>
+            
+            <button class="btn" onclick="nextStep(2)">我已认真学习，开始承诺</button>
+        </div>
+        
+        <!-- 步骤3：互动承诺游戏 -->
+        <div id="step3" class="step-container">
+            <div class="step-title">
+                <div class="icon">3</div>
+                <span>安全承诺互动</span>
+            </div>
+            
+            <p style="text-align: center; margin-bottom: 20px; color: #666;">请点击下方承诺书的每一个字，完成安全承诺</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="counter">
+                已点击：<span id="clickedCount">0</span> / <span id="totalCount">0</span> 个字
+            </div>
+            
+            <div class="pledge-text" id="pledgeText">
+                <!-- 承诺文字将通过JavaScript动态生成 -->
+            </div>
+            
+            <button class="btn" id="submitBtn" onclick="completePledge()" disabled>提交安全承诺</button>
+        </div>
+        
+        <!-- 步骤4：完成证书 -->
+        <div id="step4" class="step-container">
+            <div class="certificate">
+                <h2>🏆 安全承诺完成证书</h2>
+                
+                <div style="margin: 30px 0;">
+                    <div style="font-size: 60px; color: #1a2980;">✓</div>
+                    <p style="color: #666; margin-top: 10px;">恭喜您已完成安全责任承诺！</p>
+                </div>
+                
+                <div class="employee-info">
+                    <div><strong>姓 名：</strong> <span id="certName"></span></div>
+                    <div><strong>工 号：</strong> <span id="certId"></span></div>
+                    <div><strong>部 门：</strong> <span id="certDept"></span></div>
+                    <div><strong>完成时间：</strong> <span id="certTime"></span></div>
+                </div>
+                
+                <h3>安全承诺内容</h3>
+                <p style="font-size: 18px; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+                    我郑重承诺遵守公司安全规章制度，按时按需完成安全培训、<br>
+                    参与应急演练和完成职业健康体检，履行岗位安全职责，<br>
+                    为实现"零事故"安全生产目标贡献力量！
+                </p>
+                
+                <div class="signature-line">
+                    <p>员工签名确认</p>
+                </div>
+                
+                <div class="stamp">
+                    EHS<br>安全承诺<br>已生效
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" onclick="printCertificate()">🖨️ 打印/保存证书</button>
+                <button class="btn" style="background: #666; margin-top: 10px;" onclick="restartGame()">🔄 重新开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 承诺文本
+        const pledgeSentence = "我承诺遵守公司安全规章制度，按时按需完成安全培训、参与应急演练和完成职业健康体检。";
+        let clickedWords = 0;
+        let totalWords = 0;
+        let employeeInfo = {};
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initPledgeGame();
+        });
+        
+        // 初始化承诺游戏
+        function initPledgeGame() {
+            const pledgeTextDiv = document.getElementById('pledgeText');
+            pledgeTextDiv.innerHTML = '';
+            
+            // 将承诺文本拆分为字符数组（包括标点）
+            const words = pledgeSentence.split('');
+            totalWords = words.length;
+            
+            // 更新总字数显示
+            document.getElementById('totalCount').textContent = totalWords;
+            
+            // 为每个字创建可点击元素
+            words.forEach((word, index) => {
+                const span = document.createElement('span');
+                span.className = 'pledge-word unclicked';
+                span.textContent = word;
+                span.dataset.index = index;
+                
+                // 添加点击事件
+                span.addEventListener('click', function() {
+                    if (!this.classList.contains('clicked')) {
+                        this.classList.remove('unclicked');
+                        this.classList.add('clicked');
+                        clickedWords++;
+                        
+                        // 添加点击效果
+                        this.style.animation = 'none';
+                        setTimeout(() => {
+                            this.style.animation = 'clickEffect 0.3s';
+                        }, 10);
+                        
+                        // 更新进度
+                        updateProgress();
+                    }
+                });
+                
+                pledgeTextDiv.appendChild(span);
+            });
+            
+            // 初始化进度
+            updateProgress();
+        }
+        
+        // 更新进度条和计数
+        function updateProgress() {
+            const progress = (clickedWords / totalWords) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('clickedCount').textContent = clickedWords;
+            
+            // 如果所有字都被点击，启用提交按钮
+            const submitBtn = document.getElementById('submitBtn');
+            if (clickedWords === totalWords) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '🎉 提交安全承诺';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '提交安全承诺';
+            }
+        }
+        
+        // 切换到下一步
+        function nextStep(currentStep) {
+            // 验证步骤1的输入
+            if (currentStep === 1) {
+                const name = document.getElementById('employeeName').value.trim();
+                const id = document.getElementById('employeeId').value.trim();
+                const dept = document.getElementById('department').value;
+                
+                if (!name || !id || !dept) {
+                    alert('请填写完整的员工信息！');
+                    return;
+                }
+                
+                // 保存员工信息
+                employeeInfo = {
+                    name: name,
+                    id: id,
+                    department: dept
+                };
+            }
+            
+            // 切换到下一步
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep + 1}`).classList.add('active');
+            
+            // 如果是第三步，重新初始化游戏（确保每次进入都是初始状态）
+            if (currentStep === 2) {
+                clickedWords = 0;
+                initPledgeGame();
+            }
+        }
+        
+        // 完成承诺
+        function completePledge() {
+            // 创建庆祝效果
+            createConfetti();
+            
+            // 播放提示音（如果浏览器允许）
+            playSuccessSound();
+            
+            // 更新证书信息
+            document.getElementById('certName').textContent = employeeInfo.name;
+            document.getElementById('certId').textContent = employeeInfo.id;
+            document.getElementById('certDept').textContent = employeeInfo.department;
+            
+            // 格式化当前时间
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN');
+            document.getElementById('certTime').textContent = timeString;
+            
+            // 切换到完成页面
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('step4').classList.add('active');
+        }
+        
+        // 创建庆祝彩花效果
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffd166', '#06d6a0', '#118ab2', '#ef476f'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.opacity = '1';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                document.body.appendChild(confetti);
+                
+                // 动画
+                const animation = confetti.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${Math.random() * 100 - 50}px, ${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: 2000 + Math.random() * 3000,
+                    easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                });
+                
+                // 动画结束后移除元素
+                animation.onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+        
+        // 播放成功音效
+        function playSuccessSound() {
+            try {
+                // 创建音频上下文
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 播放成功音效
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log("音频播放失败，但不影响主要功能");
+            }
+        }
+        
+        // 打印/保存证书
+        function printCertificate() {
+            window.print();
+        }
+        
+        // 重新开始游戏
+        function restartGame() {
+            // 重置表单
+            document.getElementById('employeeName').value = '';
+            document.getElementById('employeeId').value = '';
+            document.getElementById('department').value = '';
+            
+            // 重置游戏状态
+            clickedWords = 0;
+            employeeInfo = {};
+            
+            // 回到第一步
+            document.getElementById('step4').classList.remove('active');
+            document.getElementById('step1').classList.add('active');
+        }
+    </script>
+</body>
+</html>
